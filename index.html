@@ -1,0 +1,281 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dreamy ASMR</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg,#fce1f1,#e7ddff,#d9f5ff);
+  color: #55465f;
+  text-align: center;
+}
+
+header {
+  padding: 25px;
+  background: rgba(255,255,255,0.6);
+}
+
+header h1 {
+  color: #c078b5;
+  font-size: 38px;
+}
+
+header p {
+  color: #8c719c;
+}
+
+.container {
+  max-width: 850px;
+  margin: 25px auto;
+  padding: 20px;
+}
+
+.card {
+  display: inline-block;
+  background: white;
+  width: 220px;
+  margin: 12px;
+  padding: 20px;
+  border-radius: 25px;
+  box-shadow: 0 5px 15px #d9c6df;
+  vertical-align: top;
+}
+
+.emoji {
+  font-size: 55px;
+}
+
+button {
+  background: #d68ac5;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-size: 15px;
+  margin: 5px;
+}
+
+button:hover {
+  background: #b96ca9;
+}
+
+#nowPlaying {
+  background: white;
+  padding: 25px;
+  border-radius: 25px;
+  margin: 25px auto;
+  max-width: 450px;
+  box-shadow: 0 5px 15px #d9c6df;
+}
+
+input {
+  accent-color: #c078b5;
+}
+
+footer {
+  padding: 25px;
+  color: #8c719c;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>☁️ Dreamy ASMR ☁️</h1>
+  <p>Relax, listen and enjoy! 🌸</p>
+</header>
+
+<div class="container">
+
+  <h2>✨ Kies jouw ASMR</h2>
+
+  <div class="card">
+    <div class="emoji">🌧️</div>
+    <h3>Rain ASMR</h3>
+    <p>Rustgevende regengeluiden</p>
+    <button onclick="playSound('rain')">Luisteren ▶</button>
+  </div>
+
+  <div class="card">
+    <div class="emoji">💅</div>
+    <h3>Nail Tapping</h3>
+    <p>Zachte tikgeluiden</p>
+    <button onclick="playSound('tapping')">Luisteren ▶</button>
+  </div>
+
+  <div class="card">
+    <div class="emoji">🫧</div>
+    <h3>Bubble ASMR</h3>
+    <p>Bubbelende geluiden</p>
+    <button onclick="playSound('bubble')">Luisteren ▶</button>
+  </div>
+
+  <div class="card">
+    <div class="emoji">🌊</div>
+    <h3>Ocean ASMR</h3>
+    <p>Golven op het strand</p>
+    <button onclick="playSound('ocean')">Luisteren ▶</button>
+  </div>
+
+  <div class="card">
+    <div class="emoji">🔥</div>
+    <h3>Fire ASMR</h3>
+    <p>Knus knisperend vuur</p>
+    <button onclick="playSound('fire')">Luisteren ▶</button>
+  </div>
+
+  <div class="card">
+    <div class="emoji">🌳</div>
+    <h3>Forest ASMR</h3>
+    <p>Vogels en bosgeluiden</p>
+    <button onclick="playSound('forest')">Luisteren ▶</button>
+  </div>
+
+  <div id="nowPlaying">
+    <h2>🎧 Nu aan het luisteren</h2>
+    <p id="soundName">Nog niets afgespeeld</p>
+
+    <button onclick="stopSound()">⏹ Stop</button>
+
+    <p>🔊 Volume</p>
+    <input type="range" min="0" max="100"
+    value="50" id="volume">
+  </div>
+
+</div>
+
+<footer>
+  💗 Dreamy ASMR – Your little relaxing place 💗
+</footer>
+
+<script>
+let audioContext;
+let nodes = [];
+let gain;
+let currentSound = null;
+
+function stopSound() {
+  nodes.forEach(node => {
+    try { node.stop(); } catch(e) {}
+  });
+  nodes = [];
+  currentSound = null;
+  document.getElementById("soundName").textContent =
+    "Nog niets afgespeeld 🌸";
+}
+
+function playSound(type) {
+  stopSound();
+
+  audioContext = audioContext ||
+    new (window.AudioContext || window.webkitAudioContext)();
+
+  audioContext.resume();
+
+  gain = audioContext.createGain();
+  gain.gain.value =
+    document.getElementById("volume").value / 100 * 0.12;
+  gain.connect(audioContext.destination);
+
+  currentSound = type;
+
+  const names = {
+    rain: "🌧️ Rain ASMR",
+    tapping: "💅 Nail Tapping",
+    bubble: "🫧 Bubble ASMR",
+    ocean: "🌊 Ocean ASMR",
+    fire: "🔥 Fire ASMR",
+    forest: "🌳 Forest ASMR"
+  };
+
+  document.getElementById("soundName").textContent =
+    names[type];
+
+  if(type === "tapping") {
+    tapping();
+  } else {
+    noiseSound(type);
+  }
+}
+
+function tapping() {
+  for(let i = 0; i < 100; i++) {
+    let osc = audioContext.createOscillator();
+    let volume = audioContext.createGain();
+
+    osc.type = "sine";
+    osc.frequency.value = 300 + Math.random() * 500;
+    volume.gain.setValueAtTime(0, audioContext.currentTime + i * 0.3);
+    volume.gain.setTargetAtTime(0.2, audioContext.currentTime + i * 0.3, 0.005);
+    volume.gain.setTargetAtTime(0, audioContext.currentTime + i * 0.3 + 0.03, 0.01);
+
+    osc.connect(volume);
+    volume.connect(gain);
+
+    osc.start(audioContext.currentTime + i * 0.3);
+    osc.stop(audioContext.currentTime + i * 0.3 + 0.12);
+    nodes.push(osc);
+  }
+}
+
+function noiseSound(type) {
+  const buffer = audioContext.createBuffer(
+    1, audioContext.sampleRate * 2, audioContext.sampleRate
+  );
+
+  const data = buffer.getChannelData(0);
+
+  for(let i = 0; i < data.length; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+
+  const source = audioContext.createBufferSource();
+  const filter = audioContext.createBiquadFilter();
+
+  source.buffer = buffer;
+  source.loop = true;
+
+  if(type === "rain") {
+    filter.type = "lowpass";
+    filter.frequency.value = 900;
+  } else if(type === "ocean") {
+    filter.type = "lowpass";
+    filter.frequency.value = 350;
+  } else if(type === "bubble") {
+    filter.type = "lowpass";
+    filter.frequency.value = 180;
+  } else if(type === "fire") {
+    filter.type = "highpass";
+    filter.frequency.value = 500;
+  } else {
+    filter.type = "lowpass";
+    filter.frequency.value = 1500;
+  }
+
+  source.connect(filter);
+  filter.connect(gain);
+  source.start();
+
+  nodes.push(source);
+}
+
+document.getElementById("volume").addEventListener("input", e => {
+  if(gain) {
+    gain.gain.value = e.target.value / 100 * 0.12;
+  }
+});
+</script>
+
+</body>
+</html>
